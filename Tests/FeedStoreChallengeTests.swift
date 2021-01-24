@@ -251,14 +251,6 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 }
 
-//  ***********************
-//
-//  Uncomment the following tests if your implementation has failable operations.
-//
-//  Otherwise, delete the commented out code!
-//
-//  ***********************
-
 //extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 //
 //	func test_retrieve_deliversFailureOnRetrievalError() {
