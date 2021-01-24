@@ -52,22 +52,24 @@ extension UserDefaultsFeedStore: FeedStore {
 	}
 	
 	public func retrieve(completion: @escaping RetrievalCompletion) {
-		let feedCacheKey = self.feedCacheKey
-		
 		queue.async { [weak self] in
 			do {
-				guard let data = self?.userDefaults.data(forKey: feedCacheKey) else {
-					return completion(.empty)
-				}
-				
-				let decoder = PropertyListDecoder()
-				let cache = try decoder.decode(Cache.self, from: data)
-				
-				completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
+				try self?.retrieveFeed(completion: completion)
 			} catch {
 				completion(.failure(error))
 			}
 		}
+	}
+	
+	private func retrieveFeed(completion: @escaping RetrievalCompletion) throws {
+		guard let data = userDefaults.data(forKey: feedCacheKey) else {
+			return completion(.empty)
+		}
+		
+		let decoder = PropertyListDecoder()
+		let cache = try decoder.decode(Cache.self, from: data)
+		
+		completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
 	}
 }
 
