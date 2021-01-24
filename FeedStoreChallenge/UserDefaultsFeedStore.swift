@@ -41,9 +41,12 @@ extension UserDefaultsFeedStore: FeedStore {
 		
 		queue.async(flags: .barrier) { [weak self] in
 			let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
+			
 			let encoder = PropertyListEncoder()
 			let propertyListData = try! encoder.encode(cache)
+			
 			self?.userDefaults.setValue(propertyListData, forKey: feedCacheKey)
+			
 			completion(nil)
 		}
 	}
@@ -52,13 +55,18 @@ extension UserDefaultsFeedStore: FeedStore {
 		let feedCacheKey = self.feedCacheKey
 		
 		queue.async { [weak self] in
-			guard let data = self?.userDefaults.data(forKey: feedCacheKey) else {
-				return completion(.empty)
+			do {
+				guard let data = self?.userDefaults.data(forKey: feedCacheKey) else {
+					return completion(.empty)
+				}
+				
+				let decoder = PropertyListDecoder()
+				let cache = try decoder.decode(Cache.self, from: data)
+				
+				completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
+			} catch {
+				completion(.failure(error))
 			}
-			
-			let decoder = PropertyListDecoder()
-			let cache = try! decoder.decode(Cache.self, from: data)
-			completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
 		}
 	}
 }

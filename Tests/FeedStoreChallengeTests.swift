@@ -197,21 +197,29 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 }
 
-//extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
+extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
+
+	func test_retrieve_deliversFailureOnRetrievalError() {
+		let userDefaults = testUserDefaults()
+		let sut = makeSUT(userDefaults: userDefaults)
+		
+		insert((uniqueImageFeed(), Date()), to: sut)
+		
+		let allKeys = userDefaults.dictionaryRepresentation().keys
+		for key in allKeys {
+			userDefaults.setValue(Data("invalid Data".utf8), forKey: key)
+		}
+
+		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
+	}
+
+	func test_retrieve_hasNoSideEffectsOnFailure() {
+//		let sut = makeSUT()
 //
-//	func test_retrieve_deliversFailureOnRetrievalError() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
-//	}
-//
-//	func test_retrieve_hasNoSideEffectsOnFailure() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
-//	}
-//
-//}
+//		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
+	}
+
+}
 
 //extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 //
