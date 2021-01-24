@@ -214,7 +214,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
 	private func makeSUT() -> FeedStore {
 		let sut = UserDefaultsFeedStore()
-		trackFroMemoryLeak(for: sut)
+		trackForMemoryLeak(for: sut)
 		return sut
 	}
 	
