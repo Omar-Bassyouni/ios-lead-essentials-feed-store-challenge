@@ -11,7 +11,7 @@ final class UserDefaultsFeedStore: FeedStore {
 	}
 	
 	func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		
+		completion(nil)
 	}
 	
 	func retrieve(completion: @escaping RetrievalCompletion) {
@@ -58,9 +58,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 	
 	func test_insert_deliversNoErrorOnEmptyCache() {
-		//		let sut = makeSUT()
-		//
-		//		assertThatInsertDeliversNoErrorOnEmptyCache(on: sut)
+		let sut = makeSUT()
+		
+		assertThatInsertDeliversNoErrorOnEmptyCache(on: sut)
 	}
 	
 	func test_insert_deliversNoErrorOnNonEmptyCache() {
