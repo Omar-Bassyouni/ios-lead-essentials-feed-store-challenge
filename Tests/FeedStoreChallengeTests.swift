@@ -208,7 +208,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 		sut.deleteCachedFeed { _ in
 			completedOperationsInOrder.append(exp1)
 			
-			self.fulfill(exp1, afterMilliseconds: 100)
+			self.fulfill(exp1, afterMilliseconds: 80)
 		}
 
 		let exp2 = expectation(description: "Operation 2")
@@ -235,7 +235,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
 			completedOperationsInOrder.append(exp1)
 			
-			self.fulfill(exp1, afterMilliseconds: 100)
+			self.fulfill(exp1, afterMilliseconds: 80)
 		}
 
 		let exp2 = expectation(description: "Operation 2")
