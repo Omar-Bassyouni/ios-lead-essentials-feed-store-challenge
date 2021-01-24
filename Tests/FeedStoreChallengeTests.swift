@@ -115,9 +115,14 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 	}
 
 	func test_retrieve_hasNoSideEffectsOnFailure() {
-//		let sut = makeSUT()
-//
-//		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
+		let userDefaults = testUserDefaults()
+		let sut = makeSUT(userDefaults: userDefaults)
+
+		insert((uniqueImageFeed(), Date()), to: sut)
+		
+		injectInValidData(to: userDefaults)
+		
+		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
 	}
 }
 
