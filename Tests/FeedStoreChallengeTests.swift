@@ -34,28 +34,32 @@ final class UserDefaultsFeedStore: FeedStore {
 	}
 	
 	private let queue = DispatchQueue(label: "\(UserDefaultsFeedStore.self)Queue", qos: .userInitiated, attributes: .concurrent)
+	private let userDefaults: UserDefaults
+	
+	public init(_ userDefaults: UserDefaults = UserDefaults.standard) {
+		self.userDefaults = userDefaults
+	}
 	
 	func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-		queue.async(flags: .barrier) {
-			let domain = Bundle.main.bundleIdentifier!
-			UserDefaults.standard.removePersistentDomain(forName: domain)
+		queue.async(flags: .barrier) { [weak self] in
+			self?.userDefaults.set(nil, forKey: "some key")
 			completion(nil)
 		}
 	}
 	
 	func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		queue.async(flags: .barrier) {
+		queue.async(flags: .barrier) { [weak self] in
 			let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
 			let encoder = PropertyListEncoder()
 			let propertyListData = try! encoder.encode(cache)
-			UserDefaults.standard.setValue(propertyListData, forKey: "some key")
+			self?.userDefaults.setValue(propertyListData, forKey: "some key")
 			completion(nil)
 		}
 	}
 	
 	func retrieve(completion: @escaping RetrievalCompletion) {
-		queue.async {
-			guard let data = UserDefaults.standard.data(forKey: "some key") else {
+		queue.async { [weak self] in
+			guard let data = self?.userDefaults.data(forKey: "some key") else {
 				return completion(.empty)
 			}
 			
@@ -164,10 +168,18 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
 	// - MARK: Helpers
 	
-	private func makeSUT() -> FeedStore {
-		let sut = UserDefaultsFeedStore()
-		trackForMemoryLeak(for: sut)
+	private func makeSUT(userDefaults: UserDefaults? = nil, file: StaticString = #filePath, line: UInt = #line) -> FeedStore {
+		let sut = UserDefaultsFeedStore(userDefaults ?? testUserDefaults())
+		trackForMemoryLeak(for: sut, file: file, line: line)
 		return sut
+	}
+	
+	private func testUserDefaults() -> UserDefaults {
+		return UserDefaults(suiteName: testUserDefaultsSuiteName())!
+	}
+	
+	private func testUserDefaultsSuiteName() -> String {
+		return "\(type(of: self))UserDefaultsSuiteName"
 	}
 	
 	private func trackForMemoryLeak(for object: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
@@ -185,8 +197,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 	
 	private func removeAllDataInUserDefaults() {
-		let domain = Bundle.main.bundleIdentifier!
-		UserDefaults.standard.removePersistentDomain(forName: domain)
+		UserDefaults.standard.removePersistentDomain(forName: testUserDefaultsSuiteName())
 		UserDefaults.standard.synchronize()
 	}
 	
