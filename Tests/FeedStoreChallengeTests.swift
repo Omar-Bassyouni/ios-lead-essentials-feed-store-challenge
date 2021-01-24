@@ -72,17 +72,12 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
 	override func setUp() {
 		super.setUp()
-		let domain = Bundle.main.bundleIdentifier!
-		UserDefaults.standard.removePersistentDomain(forName: domain)
-		UserDefaults.standard.synchronize()
-
+		setupEmptyFeedStoreState()
 	}
 	
 	override func tearDown() {
+		undoStoreSideEffects()
 		super.tearDown()
-		let domain = Bundle.main.bundleIdentifier!
-		UserDefaults.standard.removePersistentDomain(forName: domain)
-		UserDefaults.standard.synchronize()
 	}
 	
 	func test_retrieve_deliversEmptyOnEmptyCache() {
@@ -161,6 +156,20 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
 	private func makeSUT() -> FeedStore {
 		UserDefaultsFeedStore()
+	}
+	
+	private func setupEmptyFeedStoreState() {
+		removeAllDataInUserDefaults()
+	}
+	
+	private func undoStoreSideEffects() {
+		removeAllDataInUserDefaults()
+	}
+	
+	private func removeAllDataInUserDefaults() {
+		let domain = Bundle.main.bundleIdentifier!
+		UserDefaults.standard.removePersistentDomain(forName: domain)
+		UserDefaults.standard.synchronize()
 	}
 	
 }
