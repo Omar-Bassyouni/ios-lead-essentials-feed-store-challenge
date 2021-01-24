@@ -27,38 +27,28 @@ public final class UserDefaultsFeedStore {
 // MARK: - FeedStore
 extension UserDefaultsFeedStore: FeedStore {
 	public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-		let feedCacheKey = self.feedCacheKey
-		
-		queue.async(flags: .barrier) { [weak self] in
-			self?.userDefaults.set(nil, forKey: feedCacheKey)
-			completion(nil)
-		}
+		userDefaults.set(nil, forKey: feedCacheKey)
+		completion(nil)
 	}
 	
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		let feedCacheKey = self.feedCacheKey
+		let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
 		
-		queue.async(flags: .barrier) { [weak self] in
-			let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
-			
-			let encoder = PropertyListEncoder()
-			// Note: I don't know to test this in tests, how test drive it to put in a
-			// do catch block
-			let propertyListData = try! encoder.encode(cache)
-			
-			self?.userDefaults.setValue(propertyListData, forKey: feedCacheKey)
-			
-			completion(nil)
-		}
+		let encoder = PropertyListEncoder()
+		// Note: I don't know to test this in tests, how test drive it to put in a
+		// do-catch block
+		let propertyListData = try! encoder.encode(cache)
+		
+		userDefaults.setValue(propertyListData, forKey: feedCacheKey)
+		
+		completion(nil)
 	}
 	
 	public func retrieve(completion: @escaping RetrievalCompletion) {
-		queue.async { [weak self] in
-			do {
-				try self?.retrieveFeed(completion: completion)
-			} catch {
-				completion(.failure(error))
-			}
+		do {
+			try retrieveFeed(completion: completion)
+		} catch {
+			completion(.failure(error))
 		}
 	}
 	
