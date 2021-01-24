@@ -8,15 +8,17 @@
 
 import XCTest
 
-func testUserDefaults() -> UserDefaults {
-	return UserDefaults(suiteName: testUserDefaultsSuiteName())!
-}
+extension XCTestCase {
+	func testUserDefaults() -> UserDefaults {
+		return UserDefaults(suiteName: testUserDefaultsSuiteName())!
+	}
 
-func testUserDefaultsSuiteName() -> String {
-	return "TestsUserDefaultsSuiteName"
-}
+	func testUserDefaultsSuiteName() -> String {
+		return "\(type(of: self))UserDefaultsSuiteName"
+	}
 
-func removeAllDataInUserDefaults() {
-	UserDefaults.standard.removePersistentDomain(forName: testUserDefaultsSuiteName())
-	UserDefaults.standard.synchronize()
+	func removeAllDataInUserDefaults() {
+		UserDefaults.standard.removePersistentDomain(forName: testUserDefaultsSuiteName())
+		UserDefaults.standard.synchronize()
+	}
 }
