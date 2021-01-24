@@ -126,22 +126,6 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 	}
 }
 
-//extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
-//
-//	func test_insert_deliversErrorOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertDeliversErrorOnInsertionError(on: sut)
-//	}
-//
-//	func test_insert_hasNoSideEffectsOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
-//	}
-//
-//}
-
 //extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 //
 //	func test_delete_deliversErrorOnDeletionError() {
