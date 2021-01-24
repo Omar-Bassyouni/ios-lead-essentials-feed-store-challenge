@@ -134,14 +134,6 @@ extension FeedStoreChallengeTests {
 		return sut
 	}
 	
-	private func testUserDefaults() -> UserDefaults {
-		return UserDefaults(suiteName: testUserDefaultsSuiteName())!
-	}
-	
-	private func testUserDefaultsSuiteName() -> String {
-		return "\(type(of: self))UserDefaultsSuiteName"
-	}
-	
 	private func trackForMemoryLeak(for object: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
 		addTeardownBlock { [weak object] in
 			XCTAssertNil(object, "Potential memory leak for \(String(describing: object))", file: file, line: line)
@@ -154,11 +146,6 @@ extension FeedStoreChallengeTests {
 	
 	private func undoStoreSideEffects() {
 		removeAllDataInUserDefaults()
-	}
-	
-	private func removeAllDataInUserDefaults() {
-		UserDefaults.standard.removePersistentDomain(forName: testUserDefaultsSuiteName())
-		UserDefaults.standard.synchronize()
 	}
 	
 	private func assertThatDeleteSideEffectsRunSerially(on sut: FeedStore, file: StaticString = #filePath, line: UInt = #line) {
