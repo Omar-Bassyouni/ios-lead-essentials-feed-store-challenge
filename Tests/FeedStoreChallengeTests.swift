@@ -34,7 +34,7 @@ final class UserDefaultsFeedStore: FeedStore {
 	}
 	
 	func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-		
+		completion(nil)
 	}
 	
 	func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
@@ -111,9 +111,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 	
 	func test_delete_deliversNoErrorOnEmptyCache() {
-		//		let sut = makeSUT()
-		//
-		//		assertThatDeleteDeliversNoErrorOnEmptyCache(on: sut)
+		let sut = makeSUT()
+		
+		assertThatDeleteDeliversNoErrorOnEmptyCache(on: sut)
 	}
 	
 	func test_delete_hasNoSideEffectsOnEmptyCache() {
@@ -157,7 +157,6 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	private func removeAllDataInUserDefaults() {
 		let domain = Bundle.main.bundleIdentifier!
 		UserDefaults.standard.removePersistentDomain(forName: domain)
-		UserDefaults.standard.synchronize()
 	}
 	
 }
