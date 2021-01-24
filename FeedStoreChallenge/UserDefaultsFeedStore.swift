@@ -10,18 +10,17 @@ import Foundation
 
 public final class UserDefaultsFeedStore {
 	
+	private let userDefaults: UserDefaults
 	private let queue = DispatchQueue(label: "\(UserDefaultsFeedStore.self)Queue",
 									  qos: .userInitiated,
 									  attributes: .concurrent)
 	
-	private let userDefaults: UserDefaults
+	private var feedCacheKey: String {
+		"feed_cache_key"
+	}
 	
 	public init(_ userDefaults: UserDefaults = UserDefaults.standard) {
 		self.userDefaults = userDefaults
-	}
-	
-	private var feedCacheKey: String {
-		"feed_cache_key"
 	}
 }
 
