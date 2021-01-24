@@ -54,9 +54,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 	
 	func test_retrieve_deliversFoundValuesOnNonEmptyCache() {
-		//		let sut = makeSUT()
-		//
-		//		assertThatRetrieveDeliversFoundValuesOnNonEmptyCache(on: sut)
+		assertThatRetrieveDeliversFoundValuesOnNonEmptyCache(on: makeSUT())
 	}
 	
 	func test_retrieve_hasNoSideEffectsOnNonEmptyCache() {
