@@ -7,13 +7,6 @@ import FeedStoreChallenge
 
 class FeedStoreIntegrationTests: XCTestCase {
 	
-	//  ***********************
-	//
-	//  Uncomment and implement the following tests if your
-	//  implementation persists data to disk (e.g., CoreData/Realm)
-	//
-	//  ***********************
-	
 	override func setUp() {
 		super.setUp()
 		
