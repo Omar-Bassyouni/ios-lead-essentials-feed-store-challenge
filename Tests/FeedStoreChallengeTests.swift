@@ -14,6 +14,7 @@ class InMemoryFeedStore: FeedStore {
 	private var storedFeedModel: InMemoryFeedModel?
 	
 	func deleteCachedFeed(completion: @escaping DeletionCompletion) {
+		storedFeedModel = nil
 		completion(nil)
 	}
 	
@@ -86,9 +87,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	}
 	
 	func test_delete_emptiesPreviouslyInsertedCache() {
-		//		let sut = makeSUT()
-		//
-		//		assertThatDeleteEmptiesPreviouslyInsertedCache(on: sut)
+		assertThatDeleteEmptiesPreviouslyInsertedCache(on: makeSUT())
 	}
 	
 	func test_storeSideEffects_runSerially() {
