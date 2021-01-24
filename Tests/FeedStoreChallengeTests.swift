@@ -213,7 +213,15 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	// - MARK: Helpers
 	
 	private func makeSUT() -> FeedStore {
-		UserDefaultsFeedStore()
+		let sut = UserDefaultsFeedStore()
+		trackFroMemoryLeak(for: sut)
+		return sut
+	}
+	
+	private func trackForMemoryLeak(for object: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
+		addTeardownBlock { [weak object] in
+			XCTAssertNil(object, "Potential memory leak for \(String(describing: object))", file: file, line: line)
+		}
 	}
 	
 	private func setupEmptyFeedStoreState() {
