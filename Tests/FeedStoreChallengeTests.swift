@@ -152,62 +152,14 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
 	func test_delete_runsSerially() {
 		let sut = makeSUT()
-		var completedOperationsInOrder = [XCTestExpectation]()
-
-		let op1 = expectation(description: "Operation 1")
-		sut.deleteCachedFeed { _ in
-			completedOperationsInOrder.append(op1)
-			DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
-				op1.fulfill()
-			}
-			
-		}
-
-		let op2 = expectation(description: "Operation 2")
-		sut.deleteCachedFeed { _ in
-			completedOperationsInOrder.append(op2)
-			op2.fulfill()
-		}
-
-		let op3 = expectation(description: "Operation 3")
-		sut.deleteCachedFeed { _ in
-			completedOperationsInOrder.append(op3)
-			op3.fulfill()
-		}
-
-		waitForExpectations(timeout: 0.1)
-
-		XCTAssertEqual(completedOperationsInOrder, [op1, op2, op3], "Expected delete side-effects to run serially but operations finished in the wrong order")
+		
+		assertThatDeleteSideEffectsRunSerially(on: sut)
 	}
 	
 	func test_insert_runsSerially() {
 		let sut = makeSUT()
-		var completedOperationsInOrder = [XCTestExpectation]()
-
-		let op1 = expectation(description: "Operation 1")
-		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
-			completedOperationsInOrder.append(op1)
-			DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
-				op1.fulfill()
-			}
-			
-		}
-
-		let op2 = expectation(description: "Operation 2")
-		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
-			completedOperationsInOrder.append(op2)
-			op2.fulfill()
-		}
-
-		let op3 = expectation(description: "Operation 3")
-		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
-			completedOperationsInOrder.append(op3)
-			op3.fulfill()
-		}
-
-		waitForExpectations(timeout: 0.1)
-
-		XCTAssertEqual(completedOperationsInOrder, [op1, op2, op3], "Expected delete side-effects to run serially but operations finished in the wrong order")
+		
+		assertThatInsertSideEffectsRunSerially(on: sut)
 	}
 	
 	// - MARK: Helpers
@@ -238,6 +190,65 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 		UserDefaults.standard.synchronize()
 	}
 	
+	private func assertThatDeleteSideEffectsRunSerially(on sut: FeedStore, file: StaticString = #filePath, line: UInt = #line) {
+		var completedOperationsInOrder = [XCTestExpectation]()
+
+		let exp1 = expectation(description: "Operation 1")
+		sut.deleteCachedFeed { _ in
+			completedOperationsInOrder.append(exp1)
+			
+			self.fulfill(exp1, afterMilliseconds: 100)
+		}
+
+		let exp2 = expectation(description: "Operation 2")
+		sut.deleteCachedFeed { _ in
+			completedOperationsInOrder.append(exp2)
+			exp2.fulfill()
+		}
+
+		let exp3 = expectation(description: "Operation 3")
+		sut.deleteCachedFeed { _ in
+			completedOperationsInOrder.append(exp3)
+			exp3.fulfill()
+		}
+
+		waitForExpectations(timeout: 0.1)
+
+		XCTAssertEqual(completedOperationsInOrder, [exp1, exp2, exp3], "Expected delete side-effects to run serially but operations finished in the wrong order", file: file, line: line)
+	}
+	
+	private func assertThatInsertSideEffectsRunSerially(on sut: FeedStore, file: StaticString = #filePath, line: UInt = #line) {
+		var completedOperationsInOrder = [XCTestExpectation]()
+
+		let exp1 = expectation(description: "Operation 1")
+		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
+			completedOperationsInOrder.append(exp1)
+			
+			self.fulfill(exp1, afterMilliseconds: 100)
+		}
+
+		let exp2 = expectation(description: "Operation 2")
+		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
+			completedOperationsInOrder.append(exp2)
+			exp2.fulfill()
+		}
+
+		let exp3 = expectation(description: "Operation 3")
+		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
+			completedOperationsInOrder.append(exp3)
+			exp3.fulfill()
+		}
+
+		waitForExpectations(timeout: 0.1)
+
+		XCTAssertEqual(completedOperationsInOrder, [exp1, exp2, exp3], "Expected delete side-effects to run serially but operations finished in the wrong order", file: file, line: line)
+	}
+	
+	private func fulfill(_ exp: XCTestExpectation, afterMilliseconds milliseconds: Int) {
+		DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(milliseconds)) {
+			exp.fulfill()
+		}
+	}
 }
 
 //  ***********************
