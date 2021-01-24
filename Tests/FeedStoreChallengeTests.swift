@@ -44,7 +44,7 @@ final class UserDefaultsFeedStore: FeedStore {
 	}
 	
 	func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		queue.async {
+		queue.async(flags: .barrier) {
 			let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
 			let encoder = PropertyListEncoder()
 			let propertyListData = try! encoder.encode(cache)
@@ -171,6 +171,36 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 
 		let op3 = expectation(description: "Operation 3")
 		sut.deleteCachedFeed { _ in
+			completedOperationsInOrder.append(op3)
+			op3.fulfill()
+		}
+
+		waitForExpectations(timeout: 0.1)
+
+		XCTAssertEqual(completedOperationsInOrder, [op1, op2, op3], "Expected delete side-effects to run serially but operations finished in the wrong order")
+	}
+	
+	func test_insert_runsSerially() {
+		let sut = makeSUT()
+		var completedOperationsInOrder = [XCTestExpectation]()
+
+		let op1 = expectation(description: "Operation 1")
+		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
+			completedOperationsInOrder.append(op1)
+			DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
+				op1.fulfill()
+			}
+			
+		}
+
+		let op2 = expectation(description: "Operation 2")
+		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
+			completedOperationsInOrder.append(op2)
+			op2.fulfill()
+		}
+
+		let op3 = expectation(description: "Operation 3")
+		sut.insert(uniqueImageFeed(), timestamp: Date()) { _ in
 			completedOperationsInOrder.append(op3)
 			op3.fulfill()
 		}
