@@ -34,15 +34,11 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	//  ***********************
 	
 	func test_retrieve_deliversEmptyOnEmptyCache() {
-		let sut = makeSUT()
-		
-		assertThatRetrieveDeliversEmptyOnEmptyCache(on: sut)
+		assertThatRetrieveDeliversEmptyOnEmptyCache(on: makeSUT())
 	}
 	
 	func test_retrieve_hasNoSideEffectsOnEmptyCache() {
-		let sut = makeSUT()
-		
-		assertThatRetrieveHasNoSideEffectsOnEmptyCache(on: sut)
+		assertThatRetrieveHasNoSideEffectsOnEmptyCache(on: makeSUT())
 	}
 	
 	func test_retrieve_deliversFoundValuesOnNonEmptyCache() {
