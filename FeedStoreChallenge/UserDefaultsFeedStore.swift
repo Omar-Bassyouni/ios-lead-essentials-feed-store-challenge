@@ -19,30 +19,40 @@ public final class UserDefaultsFeedStore {
 	public init(_ userDefaults: UserDefaults = UserDefaults.standard) {
 		self.userDefaults = userDefaults
 	}
+	
+	private var feedCacheKey: String {
+		"feed_cache_key"
+	}
 }
 
 // MARK: - FeedStore
 extension UserDefaultsFeedStore: FeedStore {
 	public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
+		let feedCacheKey = self.feedCacheKey
+		
 		queue.async(flags: .barrier) { [weak self] in
-			self?.userDefaults.set(nil, forKey: "some key")
+			self?.userDefaults.set(nil, forKey: feedCacheKey)
 			completion(nil)
 		}
 	}
 	
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+		let feedCacheKey = self.feedCacheKey
+		
 		queue.async(flags: .barrier) { [weak self] in
 			let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
 			let encoder = PropertyListEncoder()
 			let propertyListData = try! encoder.encode(cache)
-			self?.userDefaults.setValue(propertyListData, forKey: "some key")
+			self?.userDefaults.setValue(propertyListData, forKey: feedCacheKey)
 			completion(nil)
 		}
 	}
 	
 	public func retrieve(completion: @escaping RetrievalCompletion) {
+		let feedCacheKey = self.feedCacheKey
+		
 		queue.async { [weak self] in
-			guard let data = self?.userDefaults.data(forKey: "some key") else {
+			guard let data = self?.userDefaults.data(forKey: feedCacheKey) else {
 				return completion(.empty)
 			}
 			
