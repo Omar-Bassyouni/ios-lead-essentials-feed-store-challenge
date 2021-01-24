@@ -9,11 +9,6 @@
 import Foundation
 
 public class InMemoryFeedStore: FeedStore {
-	private struct InMemoryFeedModel {
-		let feed:  [LocalFeedImage]
-		let timestamp: Date
-	}
-	
 	private var storedFeedModel: InMemoryFeedModel?
 	
 	public init() {}
@@ -34,5 +29,13 @@ public class InMemoryFeedStore: FeedStore {
 		}
 		
 		completion(.found(feed: model.feed, timestamp: model.timestamp))
+	}
+}
+
+// MARK: - Domain Models
+extension InMemoryFeedStore {
+	private struct InMemoryFeedModel {
+		let feed:  [LocalFeedImage]
+		let timestamp: Date
 	}
 }
