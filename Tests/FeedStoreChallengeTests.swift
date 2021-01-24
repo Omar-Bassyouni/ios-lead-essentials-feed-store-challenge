@@ -33,28 +33,36 @@ final class UserDefaultsFeedStore: FeedStore {
 		}
 	}
 	
+	private let queue = DispatchQueue(label: "\(UserDefaultsFeedStore.self)Queue", qos: .userInitiated, attributes: .concurrent)
+	
 	func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-		let domain = Bundle.main.bundleIdentifier!
-		UserDefaults.standard.removePersistentDomain(forName: domain)
-		completion(nil)
+		queue.async {
+			let domain = Bundle.main.bundleIdentifier!
+			UserDefaults.standard.removePersistentDomain(forName: domain)
+			completion(nil)
+		}
 	}
 	
 	func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
-		let encoder = PropertyListEncoder()
-		let propertyListData = try! encoder.encode(cache)
-		UserDefaults.standard.setValue(propertyListData, forKey: "some key")
-		completion(nil)
+		queue.async(flags: .barrier) {
+			let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
+			let encoder = PropertyListEncoder()
+			let propertyListData = try! encoder.encode(cache)
+			UserDefaults.standard.setValue(propertyListData, forKey: "some key")
+			completion(nil)
+		}
 	}
 	
 	func retrieve(completion: @escaping RetrievalCompletion) {
-		guard let data = UserDefaults.standard.data(forKey: "some key") else {
-			return completion(.empty)
+		queue.async {
+			guard let data = UserDefaults.standard.data(forKey: "some key") else {
+				return completion(.empty)
+			}
+			
+			let decoder = PropertyListDecoder()
+			let cache = try! decoder.decode(Cache.self, from: data)
+			completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
 		}
-		
-		let decoder = PropertyListDecoder()
-		let cache = try! decoder.decode(Cache.self, from: data)
-		completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
 	}
 }
 
