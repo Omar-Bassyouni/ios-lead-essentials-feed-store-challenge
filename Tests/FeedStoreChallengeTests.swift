@@ -100,9 +100,61 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 		
 		assertThatInsertSideEffectsRunSerially(on: sut)
 	}
-	
-	// - MARK: Helpers
-	
+}
+
+extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
+	func test_retrieve_deliversFailureOnRetrievalError() {
+		let userDefaults = testUserDefaults()
+		let sut = makeSUT(userDefaults: userDefaults)
+
+		insert((uniqueImageFeed(), Date()), to: sut)
+		
+		injectInValidData(to: userDefaults)
+
+		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
+	}
+
+	func test_retrieve_hasNoSideEffectsOnFailure() {
+//		let sut = makeSUT()
+//
+//		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
+	}
+}
+
+//extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
+//
+//	func test_insert_deliversErrorOnInsertionError() {
+////		let sut = makeSUT()
+////
+////		assertThatInsertDeliversErrorOnInsertionError(on: sut)
+//	}
+//
+//	func test_insert_hasNoSideEffectsOnInsertionError() {
+////		let sut = makeSUT()
+////
+////		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
+//	}
+//
+//}
+
+//extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
+//
+//	func test_delete_deliversErrorOnDeletionError() {
+////		let sut = makeSUT()
+////
+////		assertThatDeleteDeliversErrorOnDeletionError(on: sut)
+//	}
+//
+//	func test_delete_hasNoSideEffectsOnDeletionError() {
+////		let sut = makeSUT()
+////
+////		assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
+//	}
+//
+//}
+
+// MARK: - Helpers
+extension FeedStoreChallengeTests {
 	private func makeSUT(userDefaults: UserDefaults? = nil, file: StaticString = #filePath, line: UInt = #line) -> FeedStore {
 		let sut = UserDefaultsFeedStore(userDefaults ?? testUserDefaults())
 		trackForMemoryLeak(for: sut, file: file, line: line)
@@ -195,60 +247,11 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 			exp.fulfill()
 		}
 	}
-}
-
-extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
-
-	func test_retrieve_deliversFailureOnRetrievalError() {
-		let userDefaults = testUserDefaults()
-		let sut = makeSUT(userDefaults: userDefaults)
-		
-		insert((uniqueImageFeed(), Date()), to: sut)
-		
+	
+	private func injectInValidData(to userDefaults: UserDefaults) {
 		let allKeys = userDefaults.dictionaryRepresentation().keys
 		for key in allKeys {
 			userDefaults.setValue(Data("invalid Data".utf8), forKey: key)
 		}
-
-		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
 	}
-
-	func test_retrieve_hasNoSideEffectsOnFailure() {
-//		let sut = makeSUT()
-//
-//		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
-	}
-
 }
-
-//extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
-//
-//	func test_insert_deliversErrorOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertDeliversErrorOnInsertionError(on: sut)
-//	}
-//
-//	func test_insert_hasNoSideEffectsOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
-//	}
-//
-//}
-
-//extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
-//
-//	func test_delete_deliversErrorOnDeletionError() {
-////		let sut = makeSUT()
-////
-////		assertThatDeleteDeliversErrorOnDeletionError(on: sut)
-//	}
-//
-//	func test_delete_hasNoSideEffectsOnDeletionError() {
-////		let sut = makeSUT()
-////
-////		assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
-//	}
-//
-//}
