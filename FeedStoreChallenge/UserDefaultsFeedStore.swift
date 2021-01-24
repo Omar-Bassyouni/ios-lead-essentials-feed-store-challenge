@@ -43,6 +43,8 @@ extension UserDefaultsFeedStore: FeedStore {
 			let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
 			
 			let encoder = PropertyListEncoder()
+			// Note: I don't know to test this in tests, how test drive it to put in a
+			// do catch block
 			let propertyListData = try! encoder.encode(cache)
 			
 			self?.userDefaults.setValue(propertyListData, forKey: feedCacheKey)
