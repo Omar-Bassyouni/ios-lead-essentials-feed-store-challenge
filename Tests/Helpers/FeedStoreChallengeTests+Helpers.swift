@@ -19,6 +19,5 @@ extension XCTestCase {
 
 	func removeAllDataInUserDefaults() {
 		UserDefaults.standard.removePersistentDomain(forName: testUserDefaultsSuiteName())
-		UserDefaults.standard.synchronize()
 	}
 }
