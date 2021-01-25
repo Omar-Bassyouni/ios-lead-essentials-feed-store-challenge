@@ -89,12 +89,6 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 		assertThatSideEffectsRunSerially(on: sut)
 	}
 	
-	func test_delete_runsSerially() {
-		let sut = makeSUT()
-		
-		assertThatDeleteSideEffectsRunSerially(on: sut)
-	}
-	
 	func test_insert_runsSerially() {
 		let sut = makeSUT()
 		
@@ -146,33 +140,6 @@ extension FeedStoreChallengeTests {
 	
 	private func undoStoreSideEffects() {
 		removeAllDataInUserDefaults()
-	}
-	
-	private func assertThatDeleteSideEffectsRunSerially(on sut: FeedStore, file: StaticString = #filePath, line: UInt = #line) {
-		var completedOperationsInOrder = [XCTestExpectation]()
-
-		let exp1 = expectation(description: "Operation 1")
-		sut.deleteCachedFeed { _ in
-			completedOperationsInOrder.append(exp1)
-			
-			self.fulfill(exp1, afterMilliseconds: 80)
-		}
-
-		let exp2 = expectation(description: "Operation 2")
-		sut.deleteCachedFeed { _ in
-			completedOperationsInOrder.append(exp2)
-			exp2.fulfill()
-		}
-
-		let exp3 = expectation(description: "Operation 3")
-		sut.deleteCachedFeed { _ in
-			completedOperationsInOrder.append(exp3)
-			exp3.fulfill()
-		}
-
-		waitForExpectations(timeout: 0.1)
-
-		XCTAssertEqual(completedOperationsInOrder, [exp1, exp2, exp3], "Expected delete side-effects to run serially but operations finished in the wrong order", file: file, line: line)
 	}
 	
 	private func assertThatInsertSideEffectsRunSerially(on sut: FeedStore, file: StaticString = #filePath, line: UInt = #line) {
