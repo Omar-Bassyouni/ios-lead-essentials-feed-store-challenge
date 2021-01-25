@@ -15,7 +15,7 @@ public final class UserDefaultsFeedStore {
 		"feed_cache_key"
 	}
 	
-	public init(_ userDefaults: UserDefaults = UserDefaults.standard) {
+	public init(_ userDefaults: UserDefaults = .standard) {
 		self.userDefaults = userDefaults
 	}
 }
