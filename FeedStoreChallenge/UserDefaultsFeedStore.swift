@@ -29,8 +29,7 @@ extension UserDefaultsFeedStore: FeedStore {
 	
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
 		do {
-			try save(feed, timestamp)
-			completion(nil)
+			try save(feed, timestamp, completion: completion)
 		} catch {
 			completion(error)
 		}
@@ -46,13 +45,14 @@ extension UserDefaultsFeedStore: FeedStore {
 }
 
 extension UserDefaultsFeedStore {
-	private func save(_ feed: [LocalFeedImage], _ timestamp: Date) throws {
+	private func save(_ feed: [LocalFeedImage], _ timestamp: Date, completion: @escaping InsertionCompletion) throws {
 		let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
 		
 		let encoder = PropertyListEncoder()
 		let propertyListData = try encoder.encode(cache)
 		
 		userDefaults.setValue(propertyListData, forKey: feedCacheKey)
+		completion(nil)
 	}
 	
 	private func retrieveFeed(completion: @escaping RetrievalCompletion) throws {
