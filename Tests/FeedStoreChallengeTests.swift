@@ -136,12 +136,6 @@ extension FeedStoreChallengeTests {
 		removeAllDataInUserDefaults()
 	}
 	
-	private func fulfill(_ exp: XCTestExpectation, afterMilliseconds milliseconds: Int) {
-		DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(milliseconds)) {
-			exp.fulfill()
-		}
-	}
-	
 	private func injectInValidData(to userDefaults: UserDefaults) {
 		let allKeys = userDefaults.dictionaryRepresentation().keys
 		for key in allKeys {
