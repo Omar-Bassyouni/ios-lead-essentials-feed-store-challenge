@@ -28,16 +28,12 @@ extension UserDefaultsFeedStore: FeedStore {
 	}
 	
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
-		
-		let encoder = PropertyListEncoder()
-		// Note: I don't know to test this in tests, how test drive it to put in a
-		// do-catch block
-		let propertyListData = try! encoder.encode(cache)
-		
-		userDefaults.setValue(propertyListData, forKey: feedCacheKey)
-		
-		completion(nil)
+		do {
+			try save(feed, timestamp)
+			completion(nil)
+		} catch {
+			completion(error)
+		}
 	}
 	
 	public func retrieve(completion: @escaping RetrievalCompletion) {
@@ -46,6 +42,17 @@ extension UserDefaultsFeedStore: FeedStore {
 		} catch {
 			completion(.failure(error))
 		}
+	}
+}
+
+extension UserDefaultsFeedStore {
+	private func save(_ feed: [LocalFeedImage], _ timestamp: Date) throws {
+		let cache = Cache(feed: feed.map(UserDefaultsFeedModel.init), timestamp: timestamp)
+		
+		let encoder = PropertyListEncoder()
+		let propertyListData = try encoder.encode(cache)
+		
+		userDefaults.setValue(propertyListData, forKey: feedCacheKey)
 	}
 	
 	private func retrieveFeed(completion: @escaping RetrievalCompletion) throws {
